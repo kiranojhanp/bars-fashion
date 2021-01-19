@@ -13,10 +13,9 @@ import ProductCarousel from "../components/ProductCarousel";
 import { listProducts } from "../actions/productAction";
 
 const HomeScreen = ({ match }) => {
+  const dispatch = useDispatch();
   const keyword = match.params.keyword;
   const pageNumber = match.params.pageNumber || 1;
-
-  const dispatch = useDispatch();
 
   const productList = useSelector((state) => state.productList);
   const { loading, error, products, page, pages } = productList;
