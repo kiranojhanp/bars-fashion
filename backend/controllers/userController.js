@@ -1,6 +1,8 @@
-import asyncHandler from "express-async-handler";
-import generateToken from "../utils/generateToken.js";
-import User from "../models/userModel.js";
+const asyncHandler = require("express-async-handler");
+var validator = require("validator");
+
+const User = require("../models/userModel");
+const generateToken = require("../utils/generateToken");
 
 // @desc  Authenticate the user & get token
 // @route  POST /api/users/login
@@ -24,12 +26,32 @@ const loginUser = asyncHandler(async (req, res) => {
   }
 });
 
-
 // @desc  Register a new user
 // @route  POST /api/users/register
 // @access Public
 const registerUser = asyncHandler(async (req, res) => {
   const { name, email, password } = req.body;
+
+  if (validator.isEmpty(name)) {
+    res.status(400);
+    throw new Error("The name is empty");
+  } else if (validator.isEmpty(email)) {
+    res.status(400);
+    throw new Error("The email is empty");
+  } else if (validator.isEmpty(password)) {
+    res.status(400);
+    throw new Error("The password is empty");
+  }
+
+  if (!validator.isEmail(email.trim())) {
+    res.status(400);
+    throw new Error("Enter a proper email");
+  }
+
+  if (!validator.isAlpha(validator.blacklist(name, " "))) {
+    res.status(400);
+    throw new Error("Name can only contain letters, please re-enter the name");
+  }
 
   const userExists = await User.findOne({ email });
 
@@ -58,6 +80,7 @@ const registerUser = asyncHandler(async (req, res) => {
     throw new Error("Invalid user data");
   }
 });
+
 // @desc  Get user profile
 // @route  GET /api/users/profile
 // @access Private
@@ -168,8 +191,7 @@ const updateUserById = asyncHandler(async (req, res) => {
   }
 });
 
-
-export {
+module.exports = {
   loginUser,
   registerUser,
   getUserProfile,
